@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Montserrat, Oxanium, JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "@/providers/theme";
 import { cn } from "@/lib/utils";
 import "./globals.css";
 
@@ -28,6 +29,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         montserratHeading.variable,
         oxanium.variable,
@@ -37,7 +39,9 @@ export default function RootLayout({
         "antialiased"
       )}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }
