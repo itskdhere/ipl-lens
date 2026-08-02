@@ -15,16 +15,10 @@ export function getOpenApiDocumentation() {
   return generator.generateDocument({
     openapi: "3.0.0",
     info: {
-      title: "IPL Data Platform API",
+      title: "IPL Lens - API",
       version: "1.0.0",
       description:
-        "API documentation for IPL 2022 dataset analytics platform covering tournament standings, leaderboards, match scorecards, player profiles, wagon wheel spatial shots, and H2H matchups.",
+        "API documentation for IPL 2022 data analytics platform covering tournament standings, leaderboards, match scorecards, player profiles, wagon wheel spatial shots, and H2H matchups.",
     },
-    servers: [
-      {
-        url: process.env.NEXT_PUBLIC_APP_URL || "/",
-        description: "Current Server Environment",
-      },
-    ],
   });
 }
