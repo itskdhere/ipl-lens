@@ -1,8 +1,13 @@
 allowBuilds:
   "@prisma/engines": true
+  "@scarf/scarf": false
+  "@tree-sitter-grammars/tree-sitter-yaml": false
+  core-js-pure: false
   esbuild: true
   prisma: true
   sharp: true
+  tree-sitter: false
+  tree-sitter-json: false
   unrs-resolver: true
 ignoredBuiltDependencies:
   - sharp
