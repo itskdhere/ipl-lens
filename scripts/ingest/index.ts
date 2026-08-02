@@ -24,8 +24,8 @@ export async function runIngestionPipeline(): Promise<void> {
     await ingestMatches(ctx);
     await ingestCommentary(ctx);
     await ingestWagonWheel(ctx);
-    await ingestStandings(ctx);
-    await ingestCareerStats(ctx);
+    await ingestStandings();
+    await ingestCareerStats();
 
     const durationSec = ((Date.now() - startTime) / 1000).toFixed(2);
     console.log(

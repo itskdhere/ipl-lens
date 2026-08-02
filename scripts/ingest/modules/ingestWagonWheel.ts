@@ -3,6 +3,7 @@ import path from "path";
 import { prisma } from "../../../src/lib/prisma";
 import { DATASET_DIR, ZONE_NAMES } from "../config";
 import { IngestionContext } from "../utils/context";
+import { Prisma } from "../../../src/generated/prisma/client";
 import {
   safeFkInt,
   safeFloat,
@@ -19,7 +20,7 @@ export async function ingestWagonWheel(ctx: IngestionContext): Promise<void> {
     .readdirSync(wagonDir)
     .filter((f) => f.endsWith(".json"));
 
-  let wagonBatch: any[] = [];
+  let wagonBatch: Prisma.wagon_wheel_shotsCreateManyInput[] = [];
   let totalWagonShotsCount = 0;
 
   for (const file of wagonFiles) {

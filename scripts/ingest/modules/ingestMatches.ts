@@ -11,10 +11,79 @@ import {
   safeString,
 } from "../utils/transformers";
 
+interface RawScorecard {
+  match_id?: unknown;
+  innings?: Array<{
+    iid?: unknown;
+    number?: unknown;
+    name?: unknown;
+    short_name?: unknown;
+    batting_team_id?: unknown;
+    fielding_team_id?: unknown;
+    equations?: { runs?: unknown; wickets?: unknown; overs?: unknown };
+    scores?: string;
+    overs?: unknown;
+    scores_full?: unknown;
+    batsmen?: Array<{
+      batsman_id?: unknown;
+      bowler_id?: unknown;
+      first_fielder_id?: unknown;
+      second_fielder_id?: unknown;
+      third_fielder_id?: unknown;
+      runs?: unknown;
+      balls_faced?: unknown;
+      fours?: unknown;
+      sixes?: unknown;
+      run0?: unknown;
+      strike_rate?: unknown;
+      how_out?: unknown;
+      dismissal?: unknown;
+    }>;
+    bowlers?: Array<{
+      bowler_id?: unknown;
+      overs?: unknown;
+      maidens?: unknown;
+      runs_conceded?: unknown;
+      wickets?: unknown;
+      noballs?: unknown;
+      wides?: unknown;
+      econ?: unknown;
+      run0?: unknown;
+    }>;
+  }>;
+}
+
+interface RawMatch {
+  match_id?: unknown;
+  competition?: { cid?: unknown };
+  teama?: { team_id?: unknown; scores?: unknown; overs?: unknown };
+  teamb?: { team_id?: unknown; scores?: unknown; overs?: unknown };
+  winning_team_id?: unknown;
+  man_of_the_match?: { pid?: unknown; name?: unknown };
+  toss?: { winner?: unknown; text?: unknown; decision?: unknown };
+  venue?: { venue_id?: unknown };
+  title?: unknown;
+  short_title?: unknown;
+  subtitle?: unknown;
+  match_number?: unknown;
+  format_str?: unknown;
+  status?: unknown;
+  status_str?: unknown;
+  status_note?: unknown;
+  date_start?: unknown;
+  date_end?: unknown;
+  date_start_ist?: unknown;
+  umpires?: unknown;
+  referee?: unknown;
+  result?: unknown;
+  result_type?: unknown;
+  win_margin?: unknown;
+}
+
 export async function ingestMatches(ctx: IngestionContext): Promise<void> {
   console.log("\n5️⃣  Ingesting Matches, Innings, and Detailed Scorecards...");
 
-  const scorecardMap = new Map<number, any>();
+  const scorecardMap = new Map<number, RawScorecard>();
   const scorecardsDir = path.join(DATASET_DIR, "scorecards");
   if (fs.existsSync(scorecardsDir)) {
     const scFiles = fs
@@ -30,7 +99,7 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
     }
   }
 
-  let matchesList: any[] = [];
+  let matchesList: RawMatch[] = [];
   const matchesFilePath = path.join(DATASET_DIR, "matches", "matches.json");
   if (fs.existsSync(matchesFilePath)) {
     matchesList = JSON.parse(fs.readFileSync(matchesFilePath, "utf-8"));
@@ -76,7 +145,10 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
           title: safeString(motm?.name) || "Unknown Player",
         },
       });
-      ctx.playerMap.set(man_of_the_match_id, true);
+      ctx.playerMap.set(man_of_the_match_id, {
+        player_id: man_of_the_match_id,
+        title: safeString(motm?.name) || "Unknown Player",
+      });
     }
 
     const matchData = {

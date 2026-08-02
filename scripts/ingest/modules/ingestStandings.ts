@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { DATASET_DIR } from "../config";
 import { prisma } from "../../../src/lib/prisma";
-import { IngestionContext } from "../utils/context";
 import {
   safeFkInt,
   safeFloat,
@@ -10,7 +9,7 @@ import {
   safeString,
 } from "../utils/transformers";
 
-export async function ingestStandings(ctx: IngestionContext): Promise<void> {
+export async function ingestStandings(): Promise<void> {
   console.log("\n8️⃣  Ingesting Tournament Standings...");
   const standingsFilePath = path.join(
     DATASET_DIR,

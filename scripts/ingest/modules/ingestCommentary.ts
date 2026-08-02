@@ -3,6 +3,7 @@ import path from "path";
 import { DATASET_DIR } from "../config";
 import { prisma } from "../../../src/lib/prisma";
 import { IngestionContext } from "../utils/context";
+import { Prisma } from "../../../src/generated/prisma/client";
 import {
   safeBool,
   safeFkInt,
@@ -17,7 +18,7 @@ export async function ingestCommentary(ctx: IngestionContext): Promise<void> {
 
   const commFiles = fs.readdirSync(commDir).filter((f) => f.endsWith(".json"));
 
-  let ballCommentaryBatch: any[] = [];
+  let ballCommentaryBatch: Prisma.ball_commentaryCreateManyInput[] = [];
   let totalBallsCount = 0;
 
   for (const file of commFiles) {

@@ -11,6 +11,14 @@ import {
   safeString,
 } from "../utils/transformers";
 
+interface SquadRecord {
+  team_id: number;
+  player_id: number;
+  season: string;
+  playing_role: string | null;
+  fantasy_player_rating: number | null;
+}
+
 export async function ingestPlayers(ctx: IngestionContext): Promise<void> {
   console.log("\n3️⃣  Ingesting Players and Squads...");
   const squadsFilePath = path.join(DATASET_DIR, "squads", "squads.json");
@@ -18,7 +26,7 @@ export async function ingestPlayers(ctx: IngestionContext): Promise<void> {
 
   const squadsData = JSON.parse(fs.readFileSync(squadsFilePath, "utf-8"));
 
-  const squadRecords: any[] = [];
+  const squadRecords: SquadRecord[] = [];
 
   for (const squadGroup of squadsData) {
     const team_id = safeFkInt(
@@ -74,7 +82,7 @@ export async function ingestPlayers(ctx: IngestionContext): Promise<void> {
       create: p,
     });
   }
-  console.log(`  ✅ Ingested ${ctx.playerMap.size} unique players.`);
+  console.log(`   ✅ Ingested ${ctx.playerMap.size} unique players.`);
 
   for (const sq of squadRecords) {
     try {

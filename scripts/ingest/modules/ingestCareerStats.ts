@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import { DATASET_DIR } from "../config";
 import { prisma } from "../../../src/lib/prisma";
-import { IngestionContext } from "../utils/context";
 import {
   safeFkInt,
   safeFloat,
@@ -10,7 +9,7 @@ import {
   safeString,
 } from "../utils/transformers";
 
-export async function ingestCareerStats(ctx: IngestionContext): Promise<void> {
+export async function ingestCareerStats(): Promise<void> {
   console.log("\n9️⃣  Ingesting Player Career Statistics (Across Formats)...");
   const statsDir = path.join(DATASET_DIR, "player_career_stats");
   if (!fs.existsSync(statsDir)) return;
