@@ -1,18 +1,44 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const MatchScorecardParamsSchema = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Match ID", example: 105 }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/matches/{id}/scorecard",
+  summary: "Full match scorecard",
+  request: {
+    params: MatchScorecardParamsSchema,
+  },
+  responses: {
+    200: { description: "Batting and bowling scorecards" },
+    400: { description: "Invalid match_id parameter" },
+    404: { description: "Scorecard not found" },
+  },
+});
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const matchId = parseInt(id);
+    const rawParams = await params;
+    const parsed = MatchScorecardParamsSchema.safeParse(rawParams);
 
-    if (isNaN(matchId)) {
+    if (!parsed.success) {
       return errorResponse("Invalid match_id parameter", 400);
     }
+
+    const matchId = parsed.data.id;
 
     const innings = await prisma.match_innings.findMany({
       where: { match_id: matchId },

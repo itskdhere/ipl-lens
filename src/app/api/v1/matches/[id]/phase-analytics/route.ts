@@ -1,6 +1,29 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const MatchPhaseParamsSchema = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Match ID", example: 105 }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/matches/{id}/phase-analytics",
+  summary: "Powerplay, Middle, and Death overs breakdown",
+  request: {
+    params: MatchPhaseParamsSchema,
+  },
+  responses: {
+    200: { description: "Phase performance analytics" },
+    400: { description: "Invalid match_id parameter" },
+  },
+});
 
 interface PhaseAnalyticsRow {
   inning_id: number;
@@ -20,12 +43,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const matchId = parseInt(id);
+    const rawParams = await params;
+    const parsed = MatchPhaseParamsSchema.safeParse(rawParams);
 
-    if (isNaN(matchId)) {
+    if (!parsed.success) {
       return errorResponse("Invalid match_id parameter", 400);
     }
+
+    const matchId = parsed.data.id;
 
     const phaseAnalytics: PhaseAnalyticsRow[] = await prisma.$queryRaw`
       SELECT 

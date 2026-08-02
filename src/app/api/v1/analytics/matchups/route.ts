@@ -1,6 +1,36 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const MatchupQuerySchema = z.object({
+  batsman_id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Batsman Player ID", example: 52 }),
+  bowler_id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Bowler Player ID", example: 104 }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/analytics/matchups",
+  summary: "Head-to-head Batter vs Bowler analytics",
+  request: {
+    query: MatchupQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "H2H stats (runs, balls, dismissals, strike rate)",
+    },
+    400: { description: "Invalid parameters" },
+  },
+});
 
 interface MatchupRow {
   batsman_id: number;
@@ -21,26 +51,19 @@ interface MatchupRow {
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const batsmanIdStr = searchParams.get("batsman_id");
-    const bowlerIdStr = searchParams.get("bowler_id");
+    const rawParams = Object.fromEntries(
+      request.nextUrl.searchParams.entries()
+    );
+    const parsed = MatchupQuerySchema.safeParse(rawParams);
 
-    if (!batsmanIdStr || !bowlerIdStr) {
+    if (!parsed.success) {
       return errorResponse(
-        "Both batsman_id and bowler_id query parameters are required.",
+        "Both batsman_id and bowler_id query parameters are required and must be valid integers.",
         400
       );
     }
 
-    const batsmanId = parseInt(batsmanIdStr);
-    const bowlerId = parseInt(bowlerIdStr);
-
-    if (isNaN(batsmanId) || isNaN(bowlerId)) {
-      return errorResponse(
-        "batsman_id and bowler_id must be valid integers.",
-        400
-      );
-    }
+    const { batsman_id: batsmanId, bowler_id: bowlerId } = parsed.data;
 
     const matchup: MatchupRow[] = await prisma.$queryRaw`
       SELECT 

@@ -1,5 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/venues",
+  summary: "Venue analytics and ground statistics",
+  responses: {
+    200: {
+      description: "Venue list with average scores and toss stats",
+    },
+  },
+});
 
 interface VenueStatRow {
   venue_id: number;

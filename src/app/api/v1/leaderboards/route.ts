@@ -1,6 +1,41 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const LeaderboardQuerySchema = z.object({
+  type: z
+    .enum(["runs", "wickets", "sixes"])
+    .optional()
+    .default("runs")
+    .openapi({ description: "Leaderboard metric type" }),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .optional()
+    .default(10)
+    .openapi({ description: "Number of records to return (1-50)" }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/leaderboards",
+  summary: "Season leaderboards (Orange Cap, Purple Cap, Boundary Kings)",
+  request: {
+    query: LeaderboardQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Successful response returning leaderboard records",
+    },
+    400: {
+      description: "Invalid query parameters",
+    },
+  },
+});
 
 interface OrangeCapRow {
   player_id: number;
@@ -44,12 +79,19 @@ interface BoundaryKingsRow {
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const type = searchParams.get("type") || "runs";
-    const limit = Math.min(
-      50,
-      Math.max(1, parseInt(searchParams.get("limit") || "10"))
+    const rawParams = Object.fromEntries(
+      request.nextUrl.searchParams.entries()
     );
+    const parsed = LeaderboardQuerySchema.safeParse(rawParams);
+
+    if (!parsed.success) {
+      return errorResponse(
+        `Invalid query parameters: ${parsed.error.issues.map((i) => i.message).join(", ")}`,
+        400
+      );
+    }
+
+    const { type, limit } = parsed.data;
 
     if (type === "runs") {
       const orangeCap: OrangeCapRow[] = await prisma.$queryRaw`

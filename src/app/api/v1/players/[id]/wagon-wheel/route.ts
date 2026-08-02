@@ -2,6 +2,45 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const WagonWheelParamsSchema = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Player ID", example: 52 }),
+});
+
+export const WagonWheelQuerySchema = z.object({
+  match_id: z.coerce
+    .number()
+    .int()
+    .optional()
+    .openapi({ description: "Filter shots by match ID" }),
+  zone_id: z.coerce
+    .number()
+    .int()
+    .optional()
+    .openapi({ description: "Filter shots by field zone ID" }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/players/{id}/wagon-wheel",
+  summary: "2D spatial wagon wheel shot coordinates",
+  request: {
+    params: WagonWheelParamsSchema,
+    query: WagonWheelQuerySchema,
+  },
+  responses: {
+    200: {
+      description: "Spatial shot coordinates (x,y) and zone distributions",
+    },
+    400: { description: "Invalid parameters" },
+  },
+});
 
 interface ZoneDistributionRow {
   zone_id: number;
@@ -17,20 +56,26 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const playerId = parseInt(id);
+    const rawParams = await params;
+    const parsedParams = WagonWheelParamsSchema.safeParse(rawParams);
 
-    if (isNaN(playerId)) {
+    if (!parsedParams.success) {
       return errorResponse("Invalid player_id parameter", 400);
     }
 
-    const searchParams = request.nextUrl.searchParams;
-    const matchId = searchParams.get("match_id")
-      ? parseInt(searchParams.get("match_id")!)
-      : undefined;
-    const zoneId = searchParams.get("zone_id")
-      ? parseInt(searchParams.get("zone_id")!)
-      : undefined;
+    const playerId = parsedParams.data.id;
+
+    const rawQuery = Object.fromEntries(request.nextUrl.searchParams.entries());
+    const parsedQuery = WagonWheelQuerySchema.safeParse(rawQuery);
+
+    if (!parsedQuery.success) {
+      return errorResponse(
+        `Invalid query parameters: ${parsedQuery.error.issues.map((i) => i.message).join(", ")}`,
+        400
+      );
+    }
+
+    const { match_id: matchId, zone_id: zoneId } = parsedQuery.data;
 
     const where: Prisma.wagon_wheel_shotsWhereInput = { batsman_id: playerId };
     if (matchId) where.match_id = matchId;

@@ -1,6 +1,29 @@
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const MatchWormParamsSchema = z.object({
+  id: z.coerce
+    .number()
+    .int()
+    .positive()
+    .openapi({ description: "Match ID", example: 105 }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/matches/{id}/worm",
+  summary: "Over-by-over worm chart data",
+  request: {
+    params: MatchWormParamsSchema,
+  },
+  responses: {
+    200: { description: "Over-by-over cumulative runs and wickets" },
+    400: { description: "Invalid match_id parameter" },
+  },
+});
 
 interface WormRow {
   inning_id: number;
@@ -18,12 +41,14 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params;
-    const matchId = parseInt(id);
+    const rawParams = await params;
+    const parsed = MatchWormParamsSchema.safeParse(rawParams);
 
-    if (isNaN(matchId)) {
+    if (!parsed.success) {
       return errorResponse("Invalid match_id parameter", 400);
     }
+
+    const matchId = parsed.data.id;
 
     const overProgression: WormRow[] = await prisma.$queryRaw`
       SELECT 

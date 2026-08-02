@@ -2,21 +2,65 @@ import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@/generated/prisma/client";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+import { z } from "zod";
+
+export const MatchesQuerySchema = z.object({
+  page: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .optional()
+    .default(1)
+    .openapi({ description: "Page number (default 1)" }),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(50)
+    .optional()
+    .default(10)
+    .openapi({ description: "Number of matches per page (1-50)" }),
+  team_id: z.coerce
+    .number()
+    .int()
+    .optional()
+    .openapi({ description: "Filter matches by team ID" }),
+  venue_id: z.coerce
+    .number()
+    .int()
+    .optional()
+    .openapi({ description: "Filter matches by venue ID" }),
+});
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/matches",
+  summary: "Paginated list of matches",
+  request: {
+    query: MatchesQuerySchema,
+  },
+  responses: {
+    200: { description: "Paginated matches list" },
+    400: { description: "Invalid query parameters" },
+  },
+});
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const page = Math.max(1, parseInt(searchParams.get("page") || "1"));
-    const limit = Math.min(
-      50,
-      Math.max(1, parseInt(searchParams.get("limit") || "10"))
+    const rawParams = Object.fromEntries(
+      request.nextUrl.searchParams.entries()
     );
-    const teamId = searchParams.get("team_id")
-      ? parseInt(searchParams.get("team_id")!)
-      : undefined;
-    const venueId = searchParams.get("venue_id")
-      ? parseInt(searchParams.get("venue_id")!)
-      : undefined;
+    const parsed = MatchesQuerySchema.safeParse(rawParams);
+
+    if (!parsed.success) {
+      return errorResponse(
+        `Invalid query parameters: ${parsed.error.issues.map((i) => i.message).join(", ")}`,
+        400
+      );
+    }
+
+    const { page, limit, team_id: teamId, venue_id: venueId } = parsed.data;
     const skip = (page - 1) * limit;
 
     const where: Prisma.matchesWhereInput = {};

@@ -1,5 +1,17 @@
 import { prisma } from "@/lib/prisma";
 import { successResponse, errorResponse } from "@/lib/api-response";
+import { registry } from "@/lib/openapi";
+
+registry.registerPath({
+  method: "get",
+  path: "/api/v1/standings",
+  summary: "IPL 2022 Tournament Standings / Points Table",
+  responses: {
+    200: {
+      description: "Points table with NRR and recent form",
+    },
+  },
+});
 
 export async function GET() {
   try {
