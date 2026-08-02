@@ -6,10 +6,18 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "prisma:init": "prisma init",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate-dev": "prisma migrate dev",
+    "prisma:migrate-deploy": "prisma migrate deploy",
+    "prisma:studio": "prisma studio",
+    "prisma:db-push": "prisma db push",
+    "prisma:db-pull": "prisma db pull"
   },
   "dependencies": {
     "@base-ui/react": "1.6.0",
+    "@prisma/client": "7.9.1",
     "@tabler/icons-react": "3.46.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
@@ -29,6 +37,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
+    "prisma": "7.9.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
