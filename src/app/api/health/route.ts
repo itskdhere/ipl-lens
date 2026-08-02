@@ -1,5 +1,20 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { registry } from "@/lib/openapi";
+
+registry.registerPath({
+  method: "get",
+  path: "/api/health",
+  summary: "Health check endpoint",
+  responses: {
+    200: {
+      description: "Database and system health metrics",
+    },
+    503: {
+      description: "Database service unavailable / unhealthy state",
+    },
+  },
+});
 
 export async function GET() {
   const startTime = Date.now();
