@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +5,321 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model ball_commentary {
+  event_id                                           BigInt         @id
+  match_id                                           Int?
+  inning_id                                          Int?
+  over_number                                        Int
+  ball_number                                        Int
+  batsman_id                                         Int?
+  bowler_id                                          Int?
+  total_runs                                         Int?           @default(0)
+  bat_runs                                           Int?           @default(0)
+  noball_runs                                        Int?           @default(0)
+  wide_runs                                          Int?           @default(0)
+  bye_runs                                           Int?           @default(0)
+  legbye_runs                                        Int?           @default(0)
+  is_four                                            Boolean?       @default(false)
+  is_six                                             Boolean?       @default(false)
+  is_noball                                          Boolean?       @default(false)
+  is_wide                                            Boolean?       @default(false)
+  is_wicket                                          Boolean?       @default(false)
+  wicket_batsman_id                                  Int?
+  how_out                                            String?
+  commentary_text                                    String?
+  event_timestamp                                    BigInt?
+  players_ball_commentary_batsman_idToplayers        players?       @relation("ball_commentary_batsman_idToplayers", fields: [batsman_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_ball_commentary_bowler_idToplayers         players?       @relation("ball_commentary_bowler_idToplayers", fields: [bowler_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  match_innings                                      match_innings? @relation(fields: [inning_id], references: [inning_id], onDelete: Cascade, onUpdate: NoAction)
+  matches                                            matches?       @relation(fields: [match_id], references: [match_id], onDelete: Cascade, onUpdate: NoAction)
+  players_ball_commentary_wicket_batsman_idToplayers players?       @relation("ball_commentary_wicket_batsman_idToplayers", fields: [wicket_batsman_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([match_id, inning_id], map: "idx_commentary_match_inning")
+  @@index([batsman_id, bowler_id], map: "idx_commentary_matchup")
+  @@index([match_id, inning_id, over_number, ball_number], map: "idx_commentary_timeline")
+}
+
+model competitions {
+  cid           Int         @id
+  title         String      @db.VarChar(255)
+  abbr          String?     @db.VarChar(50)
+  type          String?     @db.VarChar(50)
+  category      String?     @db.VarChar(50)
+  match_format  String?     @db.VarChar(50)
+  season        String?     @db.VarChar(20)
+  status        String?     @db.VarChar(50)
+  datestart     DateTime?   @db.Date
+  dateend       DateTime?   @db.Date
+  country       String?     @db.VarChar(10)
+  total_matches Int?
+  total_rounds  Int?
+  total_teams   Int?
+  matches       matches[]
+  standings     standings[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model match_innings {
+  inning_id                                   Int                 @id
+  match_id                                    Int?
+  inning_number                               Int
+  name                                        String?             @db.VarChar(100)
+  short_name                                  String?             @db.VarChar(50)
+  batting_team_id                             Int?
+  fielding_team_id                            Int?
+  runs                                        Int?                @default(0)
+  wickets                                     Int?                @default(0)
+  overs                                       Decimal?            @db.Decimal(4, 1)
+  scores_full                                 String?             @db.VarChar(100)
+  ball_commentary                             ball_commentary[]
+  teams_match_innings_batting_team_idToteams  teams?              @relation("match_innings_batting_team_idToteams", fields: [batting_team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  teams_match_innings_fielding_team_idToteams teams?              @relation("match_innings_fielding_team_idToteams", fields: [fielding_team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  matches                                     matches?            @relation(fields: [match_id], references: [match_id], onDelete: Cascade, onUpdate: NoAction)
+  scorecard_batsmen                           scorecard_batsmen[]
+  scorecard_bowlers                           scorecard_bowlers[]
+  wagon_wheel_shots                           wagon_wheel_shots[]
+}
+
+model matches {
+  match_id                             Int                 @id
+  competition_id                       Int?
+  title                                String?             @db.VarChar(255)
+  short_title                          String?             @db.VarChar(100)
+  subtitle                             String?             @db.VarChar(100)
+  match_number                         String?             @db.VarChar(20)
+  format_str                           String?             @db.VarChar(20)
+  status_id                            Int?
+  status_str                           String?             @db.VarChar(50)
+  status_note                          String?
+  teama_id                             Int?
+  teamb_id                             Int?
+  teama_score                          String?             @db.VarChar(50)
+  teamb_score                          String?             @db.VarChar(50)
+  teama_overs                          String?             @db.VarChar(20)
+  teamb_overs                          String?             @db.VarChar(20)
+  date_start                           DateTime?           @db.Timestamptz(6)
+  date_end                             DateTime?           @db.Timestamptz(6)
+  date_start_ist                       DateTime?           @db.Timestamp(6)
+  venue_id                             Int?
+  umpires                              String?
+  referee                              String?
+  result                               String?
+  result_type                          Int?
+  win_margin                           String?             @db.VarChar(50)
+  winning_team_id                      Int?
+  man_of_the_match_id                  Int?
+  toss_text                            String?
+  toss_winner_id                       Int?
+  toss_decision                        Int?
+  ball_commentary                      ball_commentary[]
+  match_innings                        match_innings[]
+  competitions                         competitions?       @relation(fields: [competition_id], references: [cid], onDelete: NoAction, onUpdate: NoAction)
+  players                              players?            @relation(fields: [man_of_the_match_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  teams_matches_teama_idToteams        teams?              @relation("matches_teama_idToteams", fields: [teama_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  teams_matches_teamb_idToteams        teams?              @relation("matches_teamb_idToteams", fields: [teamb_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  teams_matches_toss_winner_idToteams  teams?              @relation("matches_toss_winner_idToteams", fields: [toss_winner_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  venues                               venues?             @relation(fields: [venue_id], references: [venue_id], onDelete: NoAction, onUpdate: NoAction)
+  teams_matches_winning_team_idToteams teams?              @relation("matches_winning_team_idToteams", fields: [winning_team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+  scorecard_batsmen                    scorecard_batsmen[]
+  scorecard_bowlers                    scorecard_bowlers[]
+  wagon_wheel_shots                    wagon_wheel_shots[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model player_career_stats {
+  id            BigInt   @id @default(autoincrement())
+  player_id     Int?
+  format_str    String   @db.VarChar(20)
+  stat_type     String   @db.VarChar(20)
+  matches       Int?     @default(0)
+  innings       Int?     @default(0)
+  runs          Int?     @default(0)
+  balls         Int?     @default(0)
+  highest_score String?  @db.VarChar(20)
+  average       Decimal? @db.Decimal(6, 2)
+  strike_rate   Decimal? @db.Decimal(6, 2)
+  hundreds      Int?     @default(0)
+  fifties       Int?     @default(0)
+  fours         Int?     @default(0)
+  sixes         Int?     @default(0)
+  wickets       Int?     @default(0)
+  best_bowling  String?  @db.VarChar(20)
+  economy       Decimal? @db.Decimal(5, 2)
+  four_wickets  Int?     @default(0)
+  five_wickets  Int?     @default(0)
+  players       players? @relation(fields: [player_id], references: [player_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([player_id, format_str, stat_type], map: "uq_player_format_stat")
+}
+
+model players {
+  player_id                                                      Int                   @id
+  title                                                          String                @db.VarChar(255)
+  short_name                                                     String?               @db.VarChar(100)
+  first_name                                                     String?               @db.VarChar(100)
+  last_name                                                      String?               @db.VarChar(100)
+  middle_name                                                    String?               @db.VarChar(100)
+  birthdate                                                      DateTime?             @db.Date
+  birthplace                                                     String?
+  country                                                        String?               @db.VarChar(10)
+  nationality                                                    String?               @db.VarChar(100)
+  playing_role                                                   String?               @db.VarChar(50)
+  batting_style                                                  String?               @db.VarChar(100)
+  bowling_style                                                  String?               @db.VarChar(100)
+  fielding_position                                              String?               @db.VarChar(100)
+  logo_url                                                       String?
+  thumb_url                                                      String?
+  facebook_profile                                               String?
+  twitter_profile                                                String?
+  instagram_profile                                              String?
+  ball_commentary_ball_commentary_batsman_idToplayers            ball_commentary[]     @relation("ball_commentary_batsman_idToplayers")
+  ball_commentary_ball_commentary_bowler_idToplayers             ball_commentary[]     @relation("ball_commentary_bowler_idToplayers")
+  ball_commentary_ball_commentary_wicket_batsman_idToplayers     ball_commentary[]     @relation("ball_commentary_wicket_batsman_idToplayers")
+  matches                                                        matches[]
+  player_career_stats                                            player_career_stats[]
+  scorecard_batsmen_scorecard_batsmen_batsman_idToplayers        scorecard_batsmen[]   @relation("scorecard_batsmen_batsman_idToplayers")
+  scorecard_batsmen_scorecard_batsmen_bowler_idToplayers         scorecard_batsmen[]   @relation("scorecard_batsmen_bowler_idToplayers")
+  scorecard_batsmen_scorecard_batsmen_first_fielder_idToplayers  scorecard_batsmen[]   @relation("scorecard_batsmen_first_fielder_idToplayers")
+  scorecard_batsmen_scorecard_batsmen_second_fielder_idToplayers scorecard_batsmen[]   @relation("scorecard_batsmen_second_fielder_idToplayers")
+  scorecard_batsmen_scorecard_batsmen_third_fielder_idToplayers  scorecard_batsmen[]   @relation("scorecard_batsmen_third_fielder_idToplayers")
+  scorecard_bowlers                                              scorecard_bowlers[]
+  team_squads                                                    team_squads[]
+  wagon_wheel_shots_wagon_wheel_shots_batsman_idToplayers        wagon_wheel_shots[]   @relation("wagon_wheel_shots_batsman_idToplayers")
+  wagon_wheel_shots_wagon_wheel_shots_bowler_idToplayers         wagon_wheel_shots[]   @relation("wagon_wheel_shots_bowler_idToplayers")
+}
+
+model scorecard_batsmen {
+  id                                                   BigInt         @id @default(autoincrement())
+  inning_id                                            Int?
+  match_id                                             Int?
+  batsman_id                                           Int?
+  batting_position                                     Int?
+  runs                                                 Int?           @default(0)
+  balls_faced                                          Int?           @default(0)
+  fours                                                Int?           @default(0)
+  sixes                                                Int?           @default(0)
+  dot_balls                                            Int?           @default(0)
+  strike_rate                                          Decimal?       @db.Decimal(6, 2)
+  how_out                                              String?
+  dismissal                                            String?        @db.VarChar(50)
+  bowler_id                                            Int?
+  first_fielder_id                                     Int?
+  second_fielder_id                                    Int?
+  third_fielder_id                                     Int?
+  players_scorecard_batsmen_batsman_idToplayers        players?       @relation("scorecard_batsmen_batsman_idToplayers", fields: [batsman_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_scorecard_batsmen_bowler_idToplayers         players?       @relation("scorecard_batsmen_bowler_idToplayers", fields: [bowler_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_scorecard_batsmen_first_fielder_idToplayers  players?       @relation("scorecard_batsmen_first_fielder_idToplayers", fields: [first_fielder_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  match_innings                                        match_innings? @relation(fields: [inning_id], references: [inning_id], onDelete: Cascade, onUpdate: NoAction)
+  matches                                              matches?       @relation(fields: [match_id], references: [match_id], onDelete: Cascade, onUpdate: NoAction)
+  players_scorecard_batsmen_second_fielder_idToplayers players?       @relation("scorecard_batsmen_second_fielder_idToplayers", fields: [second_fielder_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_scorecard_batsmen_third_fielder_idToplayers  players?       @relation("scorecard_batsmen_third_fielder_idToplayers", fields: [third_fielder_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([match_id, batsman_id], map: "idx_scorecard_bat_match")
+}
+
+model scorecard_bowlers {
+  id            BigInt         @id @default(autoincrement())
+  inning_id     Int?
+  match_id      Int?
+  bowler_id     Int?
+  overs         Decimal?       @db.Decimal(4, 1)
+  maidens       Int?           @default(0)
+  runs_conceded Int?           @default(0)
+  wickets       Int?           @default(0)
+  noballs       Int?           @default(0)
+  wides         Int?           @default(0)
+  economy       Decimal?       @db.Decimal(5, 2)
+  dot_balls     Int?           @default(0)
+  players       players?       @relation(fields: [bowler_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  match_innings match_innings? @relation(fields: [inning_id], references: [inning_id], onDelete: Cascade, onUpdate: NoAction)
+  matches       matches?       @relation(fields: [match_id], references: [match_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([match_id, bowler_id], map: "idx_scorecard_bowl_match")
+}
+
+model standings {
+  id             Int           @id @default(autoincrement())
+  competition_id Int?
+  team_id        Int?
+  played         Int?          @default(0)
+  win            Int?          @default(0)
+  loss           Int?          @default(0)
+  draw_nr        Int?          @default(0)
+  points         Int?          @default(0)
+  net_rr         Decimal?      @db.Decimal(6, 3)
+  last_five_form String?       @db.VarChar(50)
+  competitions   competitions? @relation(fields: [competition_id], references: [cid], onDelete: NoAction, onUpdate: NoAction)
+  teams          teams?        @relation(fields: [team_id], references: [team_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model team_squads {
+  squad_id              BigInt   @id @default(autoincrement())
+  team_id               Int?
+  player_id             Int?
+  season                String?  @default("2022") @db.VarChar(20)
+  playing_role          String?  @db.VarChar(50)
+  fantasy_player_rating Decimal? @db.Decimal(4, 2)
+  players               players? @relation(fields: [player_id], references: [player_id], onDelete: Cascade, onUpdate: NoAction)
+  teams                 teams?   @relation(fields: [team_id], references: [team_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([team_id, player_id, season], map: "uq_team_player_season")
+  @@index([player_id], map: "idx_squads_player")
+  @@index([team_id], map: "idx_squads_team")
+}
+
+model teams {
+  team_id                                             Int             @id
+  title                                               String          @db.VarChar(255)
+  abbr                                                String          @db.VarChar(20)
+  alt_name                                            String?         @db.VarChar(255)
+  type                                                String?         @db.VarChar(50)
+  thumb_url                                           String?
+  logo_url                                            String?
+  country                                             String?         @db.VarChar(10)
+  sex                                                 String?         @db.VarChar(10)
+  match_innings_match_innings_batting_team_idToteams  match_innings[] @relation("match_innings_batting_team_idToteams")
+  match_innings_match_innings_fielding_team_idToteams match_innings[] @relation("match_innings_fielding_team_idToteams")
+  matches_matches_teama_idToteams                     matches[]       @relation("matches_teama_idToteams")
+  matches_matches_teamb_idToteams                     matches[]       @relation("matches_teamb_idToteams")
+  matches_matches_toss_winner_idToteams               matches[]       @relation("matches_toss_winner_idToteams")
+  matches_matches_winning_team_idToteams              matches[]       @relation("matches_winning_team_idToteams")
+  standings                                           standings[]
+  team_squads                                         team_squads[]
+}
+
+model venues {
+  venue_id Int       @id
+  name     String    @db.VarChar(255)
+  location String?   @db.VarChar(255)
+  country  String?   @db.VarChar(100)
+  timezone String?   @db.VarChar(50)
+  matches  matches[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model wagon_wheel_shots {
+  shot_id                                       BigInt         @id @default(autoincrement())
+  match_id                                      Int?
+  inning_id                                     Int?
+  batsman_id                                    Int?
+  bowler_id                                     Int?
+  over_number                                   Int
+  unique_over                                   Decimal        @db.Decimal(4, 1)
+  bat_runs                                      Int?           @default(0)
+  team_runs                                     Int?           @default(0)
+  coord_x                                       Int
+  coord_y                                       Int
+  zone_id                                       Int
+  zone_name                                     String?        @db.VarChar(50)
+  event_name                                    String?        @db.VarChar(50)
+  players_wagon_wheel_shots_batsman_idToplayers players?       @relation("wagon_wheel_shots_batsman_idToplayers", fields: [batsman_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  players_wagon_wheel_shots_bowler_idToplayers  players?       @relation("wagon_wheel_shots_bowler_idToplayers", fields: [bowler_id], references: [player_id], onDelete: NoAction, onUpdate: NoAction)
+  match_innings                                 match_innings? @relation(fields: [inning_id], references: [inning_id], onDelete: Cascade, onUpdate: NoAction)
+  matches                                       matches?       @relation(fields: [match_id], references: [match_id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([coord_x, coord_y], map: "idx_wagon_wheel_coords")
+  @@index([match_id, batsman_id], map: "idx_wagon_wheel_match")
+  @@index([batsman_id, zone_id], map: "idx_wagon_wheel_player_zone")
 }

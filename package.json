@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "postinstall": "prisma generate",
     "prisma:init": "prisma init",
     "prisma:generate": "prisma generate",
     "prisma:migrate-dev": "prisma migrate dev",
     "prisma:migrate-deploy": "prisma migrate deploy",
+    "prisma:migrate-reset": "prisma migrate reset",
     "prisma:studio": "prisma studio",
     "prisma:db-push": "prisma db push",
     "prisma:db-pull": "prisma db pull"
