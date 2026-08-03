@@ -30,7 +30,22 @@ export async function GET() {
       orderBy: [{ points: "desc" }, { net_rr: "desc" }],
     });
 
-    return successResponse(standingsList);
+    const seenTeams = new Set<number>();
+    const uniqueStandings = standingsList
+      .filter((item) => {
+        const id = item.team_id || item.teams?.team_id;
+        if (!id || seenTeams.has(id)) return false;
+        seenTeams.add(id);
+        return true;
+      })
+      .map((item) => ({
+        ...item,
+        wins: item.win ?? 0,
+        losses: item.loss ?? 0,
+        recent_form: item.last_five_form ? item.last_five_form.split(",") : [],
+      }));
+
+    return successResponse(uniqueStandings);
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
     return errorResponse(message, 500);
