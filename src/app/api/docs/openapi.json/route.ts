@@ -15,6 +15,7 @@ import "@/app/api/v1/players/[id]/route";
 import "@/app/api/v1/players/[id]/career/route";
 import "@/app/api/v1/players/[id]/wagon-wheel/route";
 import "@/app/api/v1/analytics/matchups/route";
+import "@/app/api/v1/analytics/matchups/top/route";
 
 export async function GET() {
   const openApiSpec = getOpenApiDocumentation();
