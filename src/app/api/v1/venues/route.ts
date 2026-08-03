@@ -6,6 +6,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/venues",
   summary: "Venue analytics and ground statistics",
+  tags: ["Venues"],
   responses: {
     200: {
       description: "Venue list with average scores and toss stats",

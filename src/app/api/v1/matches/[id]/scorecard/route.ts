@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/matches/{id}/scorecard",
   summary: "Full match scorecard",
+  tags: ["Matches"],
   request: {
     params: MatchScorecardParamsSchema,
   },

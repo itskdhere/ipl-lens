@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/matches/{id}",
   summary: "Match detail metadata",
+  tags: ["Matches"],
   request: {
     params: MatchIdParamsSchema,
   },

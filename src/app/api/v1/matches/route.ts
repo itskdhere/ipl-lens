@@ -41,6 +41,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/matches",
   summary: "Paginated list of matches",
+  tags: ["Matches"],
   request: {
     query: MatchesQuerySchema,
   },

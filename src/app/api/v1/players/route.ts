@@ -39,6 +39,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/players",
   summary: "Player list with search and filters",
+  tags: ["Players"],
   request: {
     query: PlayersQuerySchema,
   },

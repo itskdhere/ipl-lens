@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/players/{id}/career",
   summary: "Multi-format career statistics",
+  tags: ["Players"],
   request: {
     params: PlayerCareerParamsSchema,
   },

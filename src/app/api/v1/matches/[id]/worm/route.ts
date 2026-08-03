@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/matches/{id}/worm",
   summary: "Over-by-over worm chart data",
+  tags: ["Matches"],
   request: {
     params: MatchWormParamsSchema,
   },

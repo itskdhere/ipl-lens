@@ -19,6 +19,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/analytics/matchups/top",
   summary: "Top Head-to-Head Batter vs Bowler rivalries by deliveries faced",
+  tags: ["Analytics"],
   request: {
     query: TopRivalriesQuerySchema,
   },

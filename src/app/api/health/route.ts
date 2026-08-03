@@ -6,6 +6,7 @@ registry.registerPath({
   method: "get",
   path: "/api/health",
   summary: "Health check endpoint",
+  tags: ["System"],
   responses: {
     200: {
       description: "Database and system health metrics",

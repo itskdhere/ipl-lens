@@ -30,6 +30,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/players/{id}/wagon-wheel",
   summary: "2D spatial wagon wheel shot coordinates",
+  tags: ["Players"],
   request: {
     params: WagonWheelParamsSchema,
     query: WagonWheelQuerySchema,

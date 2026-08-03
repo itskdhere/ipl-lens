@@ -21,6 +21,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/analytics/matchups",
   summary: "Head-to-head Batter vs Bowler analytics",
+  tags: ["Analytics"],
   request: {
     query: MatchupQuerySchema,
   },

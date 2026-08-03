@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/matches/{id}/phase-analytics",
   summary: "Powerplay, Middle, and Death overs breakdown",
+  tags: ["Matches"],
   request: {
     params: MatchPhaseParamsSchema,
   },

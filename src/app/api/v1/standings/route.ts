@@ -6,6 +6,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/standings",
   summary: "IPL 2022 Tournament Standings / Points Table",
+  tags: ["Standings"],
   responses: {
     200: {
       description: "Points table with NRR and recent form",

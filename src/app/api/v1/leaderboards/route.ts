@@ -24,6 +24,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/leaderboards",
   summary: "Season leaderboards (Orange Cap, Purple Cap, Boundary Kings)",
+  tags: ["Leaderboards"],
   request: {
     query: LeaderboardQuerySchema,
   },

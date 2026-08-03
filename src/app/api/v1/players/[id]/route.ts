@@ -16,6 +16,7 @@ registry.registerPath({
   method: "get",
   path: "/api/v1/players/{id}",
   summary: "Player profile details",
+  tags: ["Players"],
   request: {
     params: PlayerIdParamsSchema,
   },
