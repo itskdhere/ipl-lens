@@ -6,6 +6,10 @@ import { registry } from "@/lib/openapi";
 import { z } from "zod";
 
 export const MatchesQuerySchema = z.object({
+  search: z
+    .string()
+    .optional()
+    .openapi({ description: "Search matches by team, venue, or title" }),
   page: z.coerce
     .number()
     .int()
@@ -60,7 +64,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { page, limit, team_id: teamId, venue_id: venueId } = parsed.data;
+    const {
+      search,
+      page,
+      limit,
+      team_id: teamId,
+      venue_id: venueId,
+    } = parsed.data;
     const skip = (page - 1) * limit;
 
     const where: Prisma.matchesWhereInput = {};
@@ -69,6 +79,46 @@ export async function GET(request: NextRequest) {
     }
     if (venueId) {
       where.venue_id = venueId;
+    }
+
+    if (search && search.trim()) {
+      const q = search.trim();
+      const searchConditions: Prisma.matchesWhereInput[] = [
+        { title: { contains: q, mode: "insensitive" } },
+        { short_title: { contains: q, mode: "insensitive" } },
+        { subtitle: { contains: q, mode: "insensitive" } },
+        { status_note: { contains: q, mode: "insensitive" } },
+        { result: { contains: q, mode: "insensitive" } },
+        {
+          teams_matches_teama_idToteams: {
+            title: { contains: q, mode: "insensitive" },
+          },
+        },
+        {
+          teams_matches_teama_idToteams: {
+            abbr: { contains: q, mode: "insensitive" },
+          },
+        },
+        {
+          teams_matches_teamb_idToteams: {
+            title: { contains: q, mode: "insensitive" },
+          },
+        },
+        {
+          teams_matches_teamb_idToteams: {
+            abbr: { contains: q, mode: "insensitive" },
+          },
+        },
+        { venues: { name: { contains: q, mode: "insensitive" } } },
+        { venues: { location: { contains: q, mode: "insensitive" } } },
+      ];
+
+      if (where.OR) {
+        where.AND = [{ OR: where.OR }, { OR: searchConditions }];
+        delete where.OR;
+      } else {
+        where.OR = searchConditions;
+      }
     }
 
     const [matches, total] = await Promise.all([

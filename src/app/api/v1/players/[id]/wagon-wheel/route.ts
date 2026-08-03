@@ -112,7 +112,8 @@ export async function GET(
         COUNT(CASE WHEN bat_runs = 6 THEN 1 END)::int AS sixes
       FROM wagon_wheel_shots
       WHERE batsman_id = ${playerId}
-        ${matchId ? prisma.$queryRaw`AND match_id = ${matchId}` : prisma.$queryRaw``}
+        ${matchId ? Prisma.sql`AND match_id = ${matchId}` : Prisma.empty}
+        ${zoneId ? Prisma.sql`AND zone_id = ${zoneId}` : Prisma.empty}
       GROUP BY zone_id, zone_name
       ORDER BY zone_id ASC;
     `;

@@ -53,27 +53,40 @@ export async function GET(
     const matchId = parsed.data.id;
 
     const phaseAnalytics: PhaseAnalyticsRow[] = await prisma.$queryRaw`
+      WITH raw_phases AS (
+        SELECT 
+          bc.inning_id,
+          mi.inning_number,
+          mi.short_name AS team_name,
+          CASE 
+            WHEN bc.over_number BETWEEN 1 AND 6 THEN 'Powerplay (Overs 1-6)'
+            WHEN bc.over_number BETWEEN 7 AND 15 THEN 'Middle Overs (Overs 7-15)'
+            WHEN bc.over_number BETWEEN 16 AND 20 THEN 'Death Overs (Overs 16-20)'
+            ELSE 'Other'
+          END AS match_phase,
+          bc.total_runs,
+          bc.is_wicket,
+          bc.event_id,
+          bc.is_four,
+          bc.is_six
+        FROM ball_commentary bc
+        JOIN match_innings mi ON bc.inning_id = mi.inning_id
+        WHERE (bc.match_id = ${matchId} OR mi.match_id = ${matchId})
+      )
       SELECT 
-        bc.inning_id,
-        mi.inning_number,
-        mi.short_name AS team_name,
-        CASE 
-          WHEN bc.over_number BETWEEN 1 AND 6 THEN 'Powerplay (Overs 1-6)'
-          WHEN bc.over_number BETWEEN 7 AND 15 THEN 'Middle Overs (Overs 7-15)'
-          WHEN bc.over_number BETWEEN 16 AND 20 THEN 'Death Overs (Overs 16-20)'
-          ELSE 'Other'
-        END AS match_phase,
-        SUM(bc.total_runs)::int AS runs_scored,
-        COUNT(CASE WHEN bc.is_wicket = true THEN 1 END)::int AS wickets_lost,
-        COUNT(bc.event_id)::int AS legal_balls_faced,
-        COUNT(CASE WHEN bc.is_four = true THEN 1 END)::int AS fours,
-        COUNT(CASE WHEN bc.is_six = true THEN 1 END)::int AS sixes,
-        ROUND((SUM(bc.total_runs)::numeric / NULLIF(COUNT(bc.event_id), 0) * 6), 2)::float AS run_rate
-      FROM ball_commentary bc
-      JOIN match_innings mi ON bc.inning_id = mi.inning_id
-      WHERE bc.match_id = ${matchId}
-      GROUP BY bc.inning_id, mi.inning_number, mi.short_name, match_phase
-      ORDER BY mi.inning_number ASC, 
+        inning_id,
+        inning_number,
+        team_name,
+        match_phase,
+        SUM(total_runs)::int AS runs_scored,
+        COUNT(CASE WHEN is_wicket = true THEN 1 END)::int AS wickets_lost,
+        COUNT(event_id)::int AS legal_balls_faced,
+        COUNT(CASE WHEN is_four = true THEN 1 END)::int AS fours,
+        COUNT(CASE WHEN is_six = true THEN 1 END)::int AS sixes,
+        ROUND((SUM(total_runs)::numeric / NULLIF(COUNT(event_id), 0) * 6), 2)::float AS run_rate
+      FROM raw_phases
+      GROUP BY inning_id, inning_number, team_name, match_phase
+      ORDER BY inning_number ASC, 
         CASE match_phase
           WHEN 'Powerplay (Overs 1-6)' THEN 1
           WHEN 'Middle Overs (Overs 7-15)' THEN 2

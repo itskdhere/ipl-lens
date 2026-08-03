@@ -68,7 +68,7 @@ export async function GET(
         )::int AS cumulative_wickets
       FROM ball_commentary bc
       JOIN match_innings mi ON bc.inning_id = mi.inning_id
-      WHERE bc.match_id = ${matchId}
+      WHERE (bc.match_id = ${matchId} OR mi.match_id = ${matchId})
       GROUP BY bc.inning_id, mi.inning_number, mi.short_name, bc.over_number
       ORDER BY mi.inning_number ASC, bc.over_number ASC;
     `;

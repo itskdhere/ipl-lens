@@ -74,8 +74,17 @@ export async function GET(request: NextRequest) {
         { last_name: { contains: search, mode: "insensitive" } },
       ];
     }
-    if (role) {
-      where.playing_role = { contains: role, mode: "insensitive" };
+    if (role && role.toLowerCase().trim() !== "all") {
+      const r = role.toLowerCase().trim();
+      let roleFilter = r;
+      if (r === "batsman" || r === "bat") roleFilter = "bat";
+      else if (r === "bowler" || r === "bowl") roleFilter = "bowl";
+      else if (r === "allrounder" || r === "all-rounder" || r === "all_rounder")
+        roleFilter = "all";
+      else if (r === "keeper" || r === "wicketkeeper" || r === "wk")
+        roleFilter = "wk";
+
+      where.playing_role = { contains: roleFilter, mode: "insensitive" };
     }
     if (teamId) {
       where.team_squads = { some: { team_id: teamId } };
