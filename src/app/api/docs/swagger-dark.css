@@ -1,3 +1,7 @@
+.swagger-ui .info {
+  margin-top: 0 !important;
+}
+
 .swagger-ui .info .version-stamp,
 .swagger-ui .info .oasversion {
   color: #ffffff !important;
