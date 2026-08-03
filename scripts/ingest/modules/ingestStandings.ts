@@ -18,6 +18,8 @@ export async function ingestStandings(): Promise<void> {
   );
   if (!fs.existsSync(standingsFilePath)) return;
 
+  await prisma.standings.deleteMany({});
+
   const standingsData = JSON.parse(fs.readFileSync(standingsFilePath, "utf-8"));
 
   const standingsList = standingsData.standings?.[0]?.standings || [];
