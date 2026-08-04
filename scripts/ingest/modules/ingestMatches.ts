@@ -228,6 +228,9 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
         ctx.inningToMatchMap.set(inning_id, match_id);
 
         // Batsmen Scorecards
+        await prisma.scorecard_batsmen.deleteMany({ where: { inning_id } });
+        await prisma.scorecard_bowlers.deleteMany({ where: { inning_id } });
+
         if (inn.batsmen) {
           for (let pos = 0; pos < inn.batsmen.length; pos++) {
             const b = inn.batsmen[pos];

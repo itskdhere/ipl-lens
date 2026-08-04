@@ -31,7 +31,9 @@ export async function ingestWagonWheel(ctx: IngestionContext): Promise<void> {
     for (const inn of inningsList) {
       const inning_id = safeInt(inn.inning_id);
       const match_id = inning_id ? ctx.inningToMatchMap.get(inning_id) : null;
-      if (!match_id) continue;
+      if (!match_id || !inning_id) continue;
+
+      await prisma.wagon_wheel_shots.deleteMany({ where: { inning_id } });
 
       const wagons = inn.wagons || [];
 
