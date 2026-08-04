@@ -27,7 +27,6 @@ export async function ingestCareerStats(): Promise<void> {
 
     if (!player_id) continue;
 
-    // Batting Formats
     const battingObj = sData.batting || {};
     for (const formatStr of Object.keys(battingObj)) {
       const b = battingObj[formatStr];
@@ -74,7 +73,6 @@ export async function ingestCareerStats(): Promise<void> {
       careerStatsCount++;
     }
 
-    // Bowling Formats
     const bowlingObj = sData.bowling || {};
     for (const formatStr of Object.keys(bowlingObj)) {
       const bw = bowlingObj[formatStr];

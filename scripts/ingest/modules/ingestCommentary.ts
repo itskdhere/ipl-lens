@@ -34,7 +34,7 @@ export async function ingestCommentary(ctx: IngestionContext): Promise<void> {
     const commentaries = commData.commentaries || [];
 
     for (const c of commentaries) {
-      if (c.event === "overend") continue; // Skip over summaries
+      if (c.event === "overend") continue;
 
       const event_id = BigInt(
         c.event_id || `${match_id}${inning_id}${c.over}${c.ball}${Date.now()}`

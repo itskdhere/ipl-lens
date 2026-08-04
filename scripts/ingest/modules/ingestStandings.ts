@@ -27,7 +27,7 @@ export async function ingestStandings(): Promise<void> {
 
   for (const st of standingsList) {
     const team_id = safeFkInt(st.team_id || st.team?.tid);
-    const competition_id = 123213; // IPL 2022 Competition ID
+    const competition_id = 123213;
 
     await prisma.standings.create({
       data: {

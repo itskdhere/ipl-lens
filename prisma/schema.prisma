@@ -60,7 +60,6 @@ model competitions {
   standings     standings[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model match_innings {
   inning_id                                   Int                 @id
   match_id                                    Int?
@@ -127,7 +126,6 @@ model matches {
   wagon_wheel_shots                    wagon_wheel_shots[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model player_career_stats {
   id            BigInt   @id @default(autoincrement())
   player_id     Int?
@@ -298,7 +296,6 @@ model venues {
   matches  matches[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model wagon_wheel_shots {
   shot_id                                       BigInt         @id @default(autoincrement())
   match_id                                      Int?

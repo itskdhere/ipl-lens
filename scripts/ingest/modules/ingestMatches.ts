@@ -134,7 +134,6 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
     const toss_winner_id = safeFkInt(m.toss?.winner);
     const venue_id = safeFkInt(m.venue?.venue_id);
 
-    // Ensure Man of the Match exists in players table
     if (man_of_the_match_id && !ctx.playerMap.has(man_of_the_match_id)) {
       const motm = m.man_of_the_match;
       await prisma.players.upsert({
@@ -191,7 +190,6 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
     });
     insertedMatchesCount++;
 
-    // Ingest Innings & Scorecards if available
     const scData = scorecardMap.get(match_id);
 
     if (scData) {
@@ -227,7 +225,6 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
         insertedInningsCount++;
         ctx.inningToMatchMap.set(inning_id, match_id);
 
-        // Batsmen Scorecards
         await prisma.scorecard_batsmen.deleteMany({ where: { inning_id } });
         await prisma.scorecard_bowlers.deleteMany({ where: { inning_id } });
 
@@ -264,7 +261,6 @@ export async function ingestMatches(ctx: IngestionContext): Promise<void> {
           }
         }
 
-        // Bowlers Scorecards
         if (inn.bowlers) {
           for (const bw of inn.bowlers) {
             const bowler_id = safeFkInt(bw.bowler_id);

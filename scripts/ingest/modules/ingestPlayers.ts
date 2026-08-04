@@ -97,9 +97,7 @@ export async function ingestPlayers(ctx: IngestionContext): Promise<void> {
         update: sq,
         create: sq,
       });
-    } catch {
-      // Ignore duplicate squad entries gracefully
-    }
+    } catch {}
   }
   console.log(`   ✅ Ingested ${squadRecords.length} squad relationships.`);
 }
