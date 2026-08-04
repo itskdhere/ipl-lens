@@ -1,0 +1,96 @@
+name: ipl-lens
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: db
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ipl_db}
+    networks:
+      - net
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-ipl_db}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  setup:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: setup
+      tags:
+        - itskdhere/ipl-lens-setup:${TAG:-latest}
+    image: itskdhere/ipl-lens-setup:${TAG:-latest}
+    container_name: setup
+    restart: "no"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/ipl_db?schema=public}
+      SKIP_MIGRATIONS: ${SKIP_MIGRATIONS:-false}
+      SKIP_INGESTION: ${SKIP_INGESTION:-false}
+    networks:
+      - net
+    depends_on:
+      db:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+      tags:
+        - itskdhere/ipl-lens-app:${TAG:-latest}
+    image: itskdhere/ipl-lens-app:${TAG:-latest}
+    container_name: app
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      PORT: 3000
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@db:5432/ipl_db?schema=public}
+    networks:
+      - net
+    ports:
+      - "${PORT:-3000}:3000"
+    depends_on:
+      setup:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://127.0.0.1:3000/api/health || exit 1",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  net:
+    driver: bridge
