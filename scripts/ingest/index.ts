@@ -12,11 +12,21 @@ import { ingestVenues } from "./modules/ingestVenues";
 import { ingestWagonWheel } from "./modules/ingestWagonWheel";
 
 export async function runIngestionPipeline(): Promise<void> {
-  console.log("🚀 Starting IPL 2022 Data Ingestion Pipeline...");
+  console.log("\n🚀 Starting IPL 2022 Data Ingestion Pipeline...");
   const startTime = Date.now();
   const ctx = createIngestionContext();
 
   try {
+    const matchCount = await prisma.matches.count();
+    const commentaryCount = await prisma.ball_commentary.count();
+
+    if (matchCount > 0 && commentaryCount > 0) {
+      console.log(
+        `\nℹ️  Data already present in DB (${matchCount} matches, ${commentaryCount} commentary events). Skipping ingestion.`
+      );
+      return;
+    }
+
     await ingestCompetitions(ctx);
     await ingestTeams(ctx);
     await ingestPlayers(ctx);
