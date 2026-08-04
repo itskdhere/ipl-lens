@@ -1,4 +1,4 @@
-name: Docker Build & Release
+name: Docker Build, Release & Deploy
 
 on:
   push:
@@ -17,6 +17,7 @@ env:
   REGISTRY_DOCKERHUB: docker.io
   DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
   DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
 
 permissions:
   contents: write
@@ -138,3 +139,15 @@ jobs:
           prerelease: ${{ contains(inputs.custom_tag != '' && inputs.custom_tag || github.ref_name, '-rc') || contains(inputs.custom_tag != '' && inputs.custom_tag || github.ref_name, '-beta') || contains(inputs.custom_tag != '' && inputs.custom_tag || github.ref_name, '-alpha') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-render:
+    name: Auto Deploy to Render
+    needs: build-and-push
+    if: ${{ env.RENDER_DEPLOY_HOOK_URL != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Render Deploy Hook
+        run: |
+          echo "Triggering Render auto-deployment via Deploy Hook..."
+          curl -f -s -S -X POST "${{ env.RENDER_DEPLOY_HOOK_URL }}"
+          echo "Render deploy hook triggered successfully!"
