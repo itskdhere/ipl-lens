@@ -4,9 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "build:app": "next build",
+    "build": "npm run build:app && npm run build:ingest",
+    "build:ingest": "esbuild scripts/ingest.ts --bundle --packages=external --platform=node --target=node24 --format=esm --outfile=dist/ingest.mjs",
     "ingest": "tsx ./scripts/ingest.ts",
     "postinstall": "prisma generate",
     "prisma:init": "prisma init",
@@ -30,6 +32,7 @@
     "next": "16.2.12",
     "next-themes": "0.4.6",
     "pg": "8.22.0",
+    "prisma": "7.9.1",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "recharts": "3.8.0",
@@ -41,17 +44,18 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24",
     "@types/pg": "8.20.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/swagger-ui-react": "5.18.0",
     "babel-plugin-react-compiler": "1.0.0",
+    "esbuild": "^0.28.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.12",
-    "prisma": "7.9.1",
     "tailwindcss": "^4",
     "tsx": "4.23.1",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@11.15.0+sha512.266f8957a30d2be6e9468e5e66bcdedd35a794175f71b067ba8504d686cce1d0c0f429b33c323c3c569ad4891e667574a49ff71d1b89a22cc66f13c65818c578"
 }
