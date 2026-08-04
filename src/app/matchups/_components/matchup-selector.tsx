@@ -117,12 +117,22 @@ export function MatchupSelector({
     loadPresets();
   }, []);
 
+  if (!selectedBatsmanId && selectedBatsman !== null) {
+    setSelectedBatsman(null);
+  }
+
+  if (!selectedBowlerId && selectedBowler !== null) {
+    setSelectedBowler(null);
+  }
+
   useEffect(() => {
+    let ignore = false;
+
     async function fetchPlayerDetails(id: number, type: "batsman" | "bowler") {
       if (!id) return;
       try {
         const res = await fetch(`/api/v1/players/${id}`);
-        if (res.ok) {
+        if (res.ok && !ignore) {
           const json = await res.json();
           if (type === "batsman") setSelectedBatsman(json.data);
           else setSelectedBowler(json.data);
@@ -133,10 +143,11 @@ export function MatchupSelector({
     }
 
     if (selectedBatsmanId) fetchPlayerDetails(selectedBatsmanId, "batsman");
-    else setSelectedBatsman(null);
-
     if (selectedBowlerId) fetchPlayerDetails(selectedBowlerId, "bowler");
-    else setSelectedBowler(null);
+
+    return () => {
+      ignore = true;
+    };
   }, [selectedBatsmanId, selectedBowlerId]);
 
   useEffect(() => {
