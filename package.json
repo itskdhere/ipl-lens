@@ -8,7 +8,7 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "build:app": "next build",
-    "build": "npm run build:app && npm run build:ingest",
+    "build": "pnpm prisma:generate && pnpm build:app && pnpm build:ingest",
     "build:ingest": "esbuild scripts/ingest.ts --bundle --packages=external --platform=node --target=node24 --format=esm --outfile=dist/ingest.mjs",
     "ingest": "tsx ./scripts/ingest.ts",
     "postinstall": "prisma generate",

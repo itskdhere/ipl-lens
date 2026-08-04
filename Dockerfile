@@ -17,6 +17,7 @@ ENV NODE_ENV=production
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+COPY --from=deps /app/src/generated ./src/generated
 
 RUN pnpm build
 
@@ -40,6 +41,7 @@ COPY --from=builder /app/dataset ./dataset
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/src/generated ./src/generated
 
 RUN sed -i 's/\r$//' ./scripts/setup.sh && chmod +x ./scripts/setup.sh
 
