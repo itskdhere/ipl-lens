@@ -143,11 +143,14 @@ jobs:
   deploy-render:
     name: Auto Deploy to Render
     needs: build-and-push
-    if: ${{ env.RENDER_DEPLOY_HOOK_URL != '' }}
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Render Deploy Hook
         run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "RENDER_DEPLOY_HOOK_URL secret is not set. Skipping Render deployment."
+            exit 0
+          fi
           echo "Triggering Render auto-deployment via Deploy Hook..."
-          curl -f -s -S -X POST "${{ env.RENDER_DEPLOY_HOOK_URL }}"
+          curl -f -s -S -X POST "$RENDER_DEPLOY_HOOK_URL"
           echo "Render deploy hook triggered successfully!"
