@@ -48,6 +48,8 @@ services:
       SKIP_INGESTION: ${SKIP_INGESTION:-false}
     networks:
       - net
+    volumes:
+      - ./dataset:/app/dataset
     depends_on:
       db:
         condition: service_healthy

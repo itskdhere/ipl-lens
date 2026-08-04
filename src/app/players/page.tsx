@@ -88,7 +88,7 @@ export default function PlayersDirectoryPage() {
       <div className="border-b border-border pb-6 space-y-3">
         <h1 className="font-heading text-3xl font-extrabold flex items-center gap-2.5">
           <IconUsers className="h-8 w-8 text-primary" />
-          Player Directory & Career
+          Players Directory
         </h1>
         <p className="text-sm text-muted-foreground">
           Search across players to view individual profiles, multi-format
