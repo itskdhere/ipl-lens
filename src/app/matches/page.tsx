@@ -26,6 +26,7 @@ import {
   IconAlertCircle,
   IconSearch,
 } from "@tabler/icons-react";
+import { formatDate } from "@/lib/utils";
 
 interface MatchItem {
   match_id: number;
@@ -323,9 +324,7 @@ export default function MatchExplorerPage() {
                       </Badge>
                       <span className="text-xs text-muted-foreground flex items-center gap-1 font-mono">
                         <IconCalendar className="h-3.5 w-3.5" />
-                        {m.date_start_ist
-                          ? m.date_start_ist.split(" ")[0]
-                          : m.date_start.split("T")[0]}
+                        {formatDate(m.date_start_ist || m.date_start)}
                       </span>
                     </div>
 

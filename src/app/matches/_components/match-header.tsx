@@ -11,6 +11,7 @@ import {
   IconUser,
   IconCoin,
 } from "@tabler/icons-react";
+import { formatDate } from "@/lib/utils";
 
 export interface MatchDetailData {
   match_id: number;
@@ -77,7 +78,7 @@ export function MatchHeader({ match }: { match: MatchDetailData }) {
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground pb-4 border-b border-border/40 font-mono">
             <span className="flex items-center gap-1.5">
               <IconCalendar className="h-4 w-4 text-primary" />
-              {match.date_start_ist || match.date_start.split("T")[0]}
+              {formatDate(match.date_start_ist || match.date_start)}
             </span>
             <span className="flex items-center gap-1.5">
               <IconMapPin className="h-4 w-4 text-primary" />
