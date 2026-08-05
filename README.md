@@ -17,7 +17,7 @@
 
 IPL Lens is a full-stack web application and data platform built for querying, analyzing, and visualizing Indian Premier League (IPL 2022) cricket data. The project provides a relational database schema in PostgreSQL, RESTful backend APIs with OpenAPI (Swagger UI) documentation, an interactive Next.js web application, containerized setup via Docker Compose, and automated CI/CD pipelines.
 
-## Live Deployment and Resources
+## Links and Resources
 
 - Live Application: https://ipl-lens.itskdhere.com
 - OpenAPI Docs (Swagger UI): https://ipl-lens.itskdhere.com/api/docs
@@ -156,7 +156,7 @@ Raw OpenAPI v3 JSON format is available at `/api/docs/openapi.json`.
 - **Head-to-Head Analytics (`/matchups`)** : Interactive search tool to compare any batter against any bowler.
 - **Custom 404 Error Page (`/not-found`)** : Cricket-themed 404 page with a BackButton component and quick navigation return.
 
-## Local Setup and Running
+## Local Setup and Development
 
 ### Prerequisites
 
@@ -293,7 +293,7 @@ The repository uses two GitHub Actions workflows located in `.github/workflows`:
 ## Project Structure
 
 ```
-ipl-data-platform/
+ipl-lens/
 ├── .github/
 │   └── workflows/
 │       ├── ci.yml                     # PR, lint, typecheck, and build workflow
