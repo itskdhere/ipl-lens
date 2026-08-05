@@ -65,7 +65,7 @@ The application is structured into four main layers:
 1. **Database Layer**: PostgreSQL 16 handles structured match statistics, player profiles, ball-by-ball commentary, and wagon wheel coordinates.
 2. **Ingestion Pipeline**: A TypeScript data pipeline parses raw IPL 2022 JSON files, normalizes entities, calculates aggregated stats, and seeds the database.
 3. **Backend API Layer**: Next.js API routes query PostgreSQL via Prisma ORM. Endpoints use Zod for validation and export OpenAPI v3 specifications rendered via Swagger UI.
-4. **Frontend Presentation Layer**: Next.js App Router (React 19) rendered with Tailwind CSS v4, Base UI, Recharts, and Tabler Icons.
+4. **Frontend Presentation Layer**: Next.js App Router (React 19) rendered with Tailwind CSS v4, Base UI, Recharts, Tabler Icons, and `next-themes`.
 
 ## Tech Stack
 
@@ -73,7 +73,7 @@ The application is structured into four main layers:
 - **ORM**: Prisma ORM v7
 - **Backend**: Next.js 16 (Node.js v24 LTS)
 - **API Validation & Documentation**: Zod, `@asteasolutions/zod-to-openapi`, Swagger UI React
-- **Frontend**: Next.js 16, React 19, Tailwind CSS v4, Recharts, Base UI
+- **Frontend**: Next.js 16, React 19, Tailwind CSS v4, Recharts, Base UI, Tabler Icons, `next-themes`
 - **Containerization**: Docker (Multi-stage build), Docker Compose
 - **CI/CD**: GitHub Actions, GitHub Container Registry, Docker Hub
 - **Deployment**: Render, Neon
@@ -135,11 +135,11 @@ All backend endpoints return JSON format, enforce validation via Zod, and includ
 
 ### Analytics and Leaderboards Endpoints
 
-- `GET /api/v1/leaderboards`: Top run scorers (Orange Cap candidates) and top wicket takers (Purple Cap candidates).
+- `GET /api/v1/leaderboards`: Season leaderboards for top run scorers (Orange Cap), top wicket takers (Purple Cap), and boundary hitters (Boundary Kings). Supports `type` (`runs`, `wickets`, `sixes`) and `limit` query parameters.
 - `GET /api/v1/analytics/matchups`: Head-to-head statistics between a specific batter and bowler.
-- `GET /api/v1/analytics/matchups/top`: Highest frequency player rivalries across the dataset.
-- `GET /api/v1/standings`: League points table data.
-- `GET /api/v1/venues`: List of grounds and total matches hosted.
+- `GET /api/v1/analytics/matchups/top`: Top head-to-head player rivalries across the dataset sorted by deliveries faced.
+- `GET /api/v1/standings`: League points table data with win/loss records, NRR, and recent 5-match form.
+- `GET /api/v1/venues`: List of grounds with total matches hosted, 1st/2nd innings average scores, and toss decisions.
 
 ### API Documentation
 
@@ -148,12 +148,13 @@ Raw OpenAPI v3 JSON format is available at `/api/docs/openapi.json`.
 
 ## Frontend Features
 
-- Tournament Dashboard (`/dashboard`): Overview of competition standings, top run scorers, top wicket takers, and featured player rivalries.
-- Match Directory (`/matches`): List of matches with status filters, team filters, and pagination.
-- Match Center (`/matches/[id]`): Detailed view of a match including team line-ups, scorecards, over-by-over worm charts, phase breakdown charts, and ball-by-ball commentary.
-- Player Directory (`/players`): Directory of players with filtering by team, role, and search keywords.
-- Player Profile (`/players/[id]`): Detailed player card, career summary stats, and interactive wagon wheel shot distribution map.
-- Head-to-Head Analytics (`/matchups`): Interactive search tool to compare any batter against any bowler.
+- **Tournament Dashboard (`/dashboard`)** : Overview of competition standings, top run scorers, top wicket takers, and featured player rivalries.
+- **Match Directory (`/matches`)** : List of matches with status filters, team filters, formatted IST dates, and pagination.
+- **Match Center (`/matches/[id]`)** : Detailed view of a match including team line-ups, scorecards, over-by-over worm charts, phase breakdown charts, and ball-by-ball commentary.
+- **Player Directory (`/players`)** : Directory of players with filtering by team, playing role, and search keywords.
+- **Player Profile (`/players/[id]`)** : Detailed player card, career summary stats, zone radar chart, and interactive wagon wheel shot distribution map.
+- **Head-to-Head Analytics (`/matchups`)** : Interactive search tool to compare any batter against any bowler.
+- **Custom 404 Error Page (`/not-found`)** : Cricket-themed 404 page with a BackButton component and quick navigation return.
 
 ## Local Setup and Running
 
@@ -279,13 +280,14 @@ The repository uses two GitHub Actions workflows located in `.github/workflows`:
 
 1. Code Quality CI (`ci.yml`):
    - Triggers on pull requests and pushes to `main`.
+   - Set up on Node.js 24 and pnpm v11 with dependency caching.
    - Runs ESLint (`pnpm lint`), TypeScript type checking (`pnpm typecheck`), and Next.js build (`pnpm build`).
 
 2. Docker Build, Release, and Deployment (`docker-release-deploy.yml`):
-   - Triggers on tag pushes matching `v*` (e.g. `v1.0.0`) or manual workflow dispatch.
+   - Triggers on tag pushes matching `v*` (e.g. `v1.0.0`) or manual workflow dispatch with custom tag input.
    - Builds multi-stage Docker targets for `ipl-lens-app` and `ipl-lens-setup`.
    - Publishes images to both GitHub Container Registry (GHCR) and Docker Hub.
-   - Creates a GitHub Release with build details and release notes.
+   - Creates a GitHub Release using `softprops/action-gh-release@v3` with build details and automated release notes.
    - Triggers automatic deployment to Render using a deploy hook webhook URL.
 
 ## Project Structure
@@ -294,32 +296,44 @@ The repository uses two GitHub Actions workflows located in `.github/workflows`:
 ipl-data-platform/
 ├── .github/
 │   └── workflows/
-│       ├── ci.yml                     # PR and lint check workflow
-│       └── docker-release-deploy.yml  # Docker build, release, and deploy workflow
+│       ├── ci.yml                     # PR, lint, typecheck, and build workflow
+│       └── docker-release-deploy.yml  # Docker build, GHCR/DockerHub push, release & Render deploy
 ├── dataset/                           # Raw IPL 2022 dataset JSON files
 ├── prisma/
 │   ├── migrations/                    # Database migration history
 │   └── schema.prisma                  # Prisma ORM schema definitions
+├── public/                            # Static media and branding assets (app icons, logos)
 ├── scripts/
-│   ├── ingest/                        # Ingestion pipeline logic and modules
-│   ├── ingest.ts                      # Ingestion entrypoint script
+│   ├── ingest/                        # Ingestion modules (matches, players, stats) & utils
+│   ├── ingest.ts                      # Data ingestion entrypoint script
 │   └── setup.sh                       # Docker setup container entrypoint script
 ├── src/
 │   ├── app/                           # Next.js App Router routes and API endpoints
 │   │   ├── api/                       # API routes (matches, players, analytics, etc.)
 │   │   │   ├── docs/                  # Swagger UI and openapi.json route
 │   │   │   ├── health/                # Health check endpoint
-│   │   │   └── v1/                    # v1 REST API routes
+│   │   │   └── v1/                    # v1 REST API routes (analytics, leaderboards, matches, players, standings, venues)
 │   │   ├── dashboard/                 # Analytics dashboard page
 │   │   ├── matches/                   # Matches directory and match detail pages
 │   │   ├── matchups/                  # Head-to-head matchup page
-│   │   └── players/                   # Players directory and profile pages
-│   ├── components/                    # Reusable React components and UI widgets
+│   │   ├── players/                   # Players directory and profile pages
+│   │   ├── globals.css                # Global CSS styles & Tailwind v4 theme configuration
+│   │   ├── layout.tsx                 # Root layout with fonts, navigation, and theme provider
+│   │   ├── not-found.tsx              # Cricket-themed custom 404 error page
+│   │   └── page.tsx                   # Root landing page (redirects to /dashboard)
+│   ├── components/                    # UI elements, cards, charts, and layout components (Navbar, Footer)
+│   │   ├── layout/                    # Header navbar and footer components
+│   │   └── ui/                        # Reusable Base UI primitives (Button, BackButton, Badge, Select, Tabs, Chart, etc.)
 │   ├── generated/                     # Generated Prisma client code
-│   └── lib/                           # Utility functions, Prisma client, and OpenAPI generators
-├── Dockerfile                         # Multi-stage Docker build config
-├── docker-compose.yml                 # Local orchestrator config
-└── package.json                       # Project dependencies and script runner
+│   ├── lib/                           # Utility functions, Prisma client, API responses, and OpenAPI generator
+│   └── providers/                     # React Context providers (Theme Provider for dark/light mode)
+├── .env.example                       # Sample environment configuration file
+├── components.json                    # Component registry and styling settings
+├── Dockerfile                         # Multi-stage Docker build config (setup & runner targets)
+├── docker-compose.yml                 # Local orchestrator config (db, setup, app)
+├── next.config.ts                     # Next.js framework configuration
+├── package.json                       # Project dependencies and script runner
+└── prisma.config.ts                   # Prisma ORM configuration
 ```
 
 <br>
