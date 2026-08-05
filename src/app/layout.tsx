@@ -25,6 +25,20 @@ export const metadata: Metadata = {
   },
   description:
     "IPL 2022 data analytics platform covering tournament standings, leaderboards, match scorecards, player profiles, wagon wheel spatial shots, and H2H matchups.",
+  robots: "index, follow",
+  creator: "Krishnendu Das",
+  authors: [{ name: "Krishnendu Das", url: "https://itskdhere.com" }],
+  keywords: [
+    "IPL",
+    "IPL 2022",
+    "IPL Data Platform",
+    "IPL 2022 Data Platform",
+    "IPL Data Visualization",
+    "IPL 2022 Data Visualization",
+    "IPL Lens",
+    "IPL-Lens",
+    "itskdhere",
+  ],
 };
 
 export default function RootLayout({

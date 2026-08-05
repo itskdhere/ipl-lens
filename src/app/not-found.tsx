@@ -1,14 +1,14 @@
-"use client";
-
 import Link from "next/link";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  IconArrowLeft,
-  IconAlertCircle,
-  IconLayoutDashboard,
-} from "@tabler/icons-react";
+import { BackButton } from "@/components/ui/back-button";
+import { IconAlertCircle, IconLayoutDashboard } from "@tabler/icons-react";
+
+export const metadata: Metadata = {
+  title: "404 - Page Not Found",
+};
 
 export default function NotFound() {
   return (
@@ -58,14 +58,7 @@ export default function NotFound() {
       </div>
 
       <div className="flex items-center gap-3 pt-2">
-        <Button
-          variant="outline"
-          onClick={() => window.history.back()}
-          className="gap-1.5 text-xs"
-        >
-          <IconArrowLeft className="h-3.5 w-3.5" />
-          Go Back
-        </Button>
+        <BackButton />
         <Link href="/dashboard">
           <Button className="gap-1.5 text-xs font-semibold">
             <IconLayoutDashboard className="h-3.5 w-3.5" />
