@@ -123,7 +123,7 @@ export function MatchHeader({ match }: { match: MatchDetailData }) {
             </div>
 
             <div className="col-span-2 flex flex-col items-center justify-center">
-              <span className="font-mono text-sm font-extrabold text-muted-foreground/60 bg-muted px-3 py-1 rounded-full border">
+              <span className="font-mono text-sm font-extrabold text-muted-foreground/60 bg-muted px-3 py-1 rounded-none border">
                 VS
               </span>
             </div>

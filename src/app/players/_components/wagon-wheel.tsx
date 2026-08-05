@@ -85,7 +85,7 @@ export function WagonWheel({ shots }: WagonWheelProps) {
 
   return (
     <Card className="border-border/80 shadow-md h-full flex flex-col">
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3">
+      <CardHeader className="flex flex-col gap-3 pb-3">
         <div>
           <CardTitle className="text-lg font-heading font-bold flex items-center gap-2">
             <IconCricket className="h-5 w-5 text-primary" />
@@ -138,7 +138,7 @@ export function WagonWheel({ shots }: WagonWheelProps) {
             variant={showLines ? "secondary" : "outline"}
             size="sm"
             onClick={() => setShowLines(!showLines)}
-            className="h-8 text-xs gap-1 font-medium"
+            className="h-8 text-xs gap-1.5 font-medium"
             title="Toggle Shot Lines"
           >
             <IconEye className="h-3.5 w-3.5" />

@@ -74,7 +74,7 @@ export function ZoneRadarChart({ zoneData }: ZoneRadarChartProps) {
 
   return (
     <Card className="border-border/80 shadow-md h-full flex flex-col">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-col gap-3 pb-3">
         <div className="space-y-1">
           <CardTitle className="text-lg font-heading font-bold flex items-center gap-2">
             <IconChartRadar className="h-5 w-5 text-primary" />
@@ -86,7 +86,7 @@ export function ZoneRadarChart({ zoneData }: ZoneRadarChartProps) {
         </div>
 
         {dominantZone && dominantZone.runs > 0 && (
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-none bg-primary/10 border border-primary/20 text-xs font-mono text-primary">
+          <div className="flex items-center gap-1.5 px-3 py-1 rounded-none bg-primary/10 border border-primary/20 text-xs font-mono text-primary w-fit">
             <IconTarget className="h-3.5 w-3.5" />
             <span>
               Strongest Zone: <strong>{dominantZone.zoneName}</strong> (
