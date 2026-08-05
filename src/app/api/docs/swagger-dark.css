@@ -1,3 +1,8 @@
+.swagger-ui .wrapper {
+  padding: 0 !important;
+  max-width: 100% !important;
+}
+
 .swagger-ui .info {
   margin-top: 0 !important;
 }

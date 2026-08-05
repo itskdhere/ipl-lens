@@ -106,7 +106,7 @@ export default function PlayerDetailsPage({ params }: PlayerPageProps) {
 
   if (loading) {
     return (
-      <main className="container mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Skeleton className="h-32 w-full rounded-none" />
         <Skeleton className="h-64 w-full rounded-none" />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -119,7 +119,7 @@ export default function PlayerDetailsPage({ params }: PlayerPageProps) {
 
   if (error || !player) {
     return (
-      <main className="container mx-auto px-4 sm:px-6 py-12">
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <Card className="max-w-md mx-auto border-destructive/50 bg-destructive/5">
           <CardContent className="p-8 text-center space-y-4">
             <IconAlertTriangle className="h-12 w-12 text-destructive mx-auto" />
@@ -140,7 +140,7 @@ export default function PlayerDetailsPage({ params }: PlayerPageProps) {
   }
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       <div className="flex items-center justify-between">
         <Link href="/players">
           <Button

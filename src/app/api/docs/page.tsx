@@ -33,8 +33,8 @@ export default function ApiDocsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background text-foreground container mx-auto px-4 py-8 relative">
-      <div className="flex justify-center md:justify-end md:absolute md:top-11 md:right-12 z-10 gap-2 mb-4 md:mb-0">
+    <div className="min-h-screen bg-background text-foreground w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 relative">
+      <div className="flex justify-center md:justify-end md:absolute md:top-11 md:right-6 z-10 gap-2 mb-4 md:mb-0">
         <Button variant="outline" size="sm" onClick={handleCopySpecUrl}>
           {copied ? (
             <IconCheck className="size-4 text-emerald-500 mr-1.5" />

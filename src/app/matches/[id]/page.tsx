@@ -64,7 +64,7 @@ export default function MatchDetailsPage({
 
   if (loading) {
     return (
-      <main className="container mx-auto px-4 sm:px-6 py-8 space-y-6">
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Skeleton className="h-64 w-full rounded-none" />
         <Skeleton className="h-44 w-full rounded-none" />
         <Skeleton className="h-96 w-full rounded-none" />
@@ -74,7 +74,7 @@ export default function MatchDetailsPage({
 
   if (error || !match) {
     return (
-      <main className="container mx-auto px-4 sm:px-6 py-12">
+      <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-12">
         <Card className="max-w-lg mx-auto border-destructive/30 bg-destructive/5 p-8 text-center space-y-3">
           <IconAlertCircle className="h-10 w-10 text-destructive mx-auto" />
           <h2 className="text-lg font-bold text-destructive">
@@ -89,7 +89,7 @@ export default function MatchDetailsPage({
   }
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       <MatchHeader match={match} />
 
       <PhaseBreakdown matchId={matchId} />

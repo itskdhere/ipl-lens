@@ -52,7 +52,7 @@ export default function MatchupsPage() {
   }, [batsmanId, bowlerId]);
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border pb-6">
         <div>
           <h1 className="font-heading text-3xl font-extrabold flex items-center gap-2.5">

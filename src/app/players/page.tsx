@@ -44,6 +44,8 @@ interface PlayerItem {
   }>;
 }
 
+const PAGE_SIZE = 20;
+
 export default function PlayersDirectoryPage() {
   const [players, setPlayers] = useState<PlayerItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,7 +61,7 @@ export default function PlayersDirectoryPage() {
       try {
         const queryParams = new URLSearchParams();
         queryParams.append("page", page.toString());
-        queryParams.append("limit", "18");
+        queryParams.append("limit", PAGE_SIZE.toString());
         if (search.trim()) queryParams.append("search", search.trim());
         if (role !== "all") queryParams.append("role", role);
 
@@ -84,7 +86,7 @@ export default function PlayersDirectoryPage() {
   }, [search, role, page]);
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <main className="w-full max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-6">
       <div className="border-b border-border pb-6 space-y-3">
         <h1 className="font-heading text-3xl font-extrabold flex items-center gap-2.5">
           <IconUsers className="h-8 w-8 text-primary" />
@@ -201,8 +203,8 @@ export default function PlayersDirectoryPage() {
       )}
 
       {loading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {Array.from({ length: 12 }).map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {Array.from({ length: 20 }).map((_, i) => (
             <Skeleton key={i} className="h-44 w-full rounded-none" />
           ))}
         </div>
@@ -225,7 +227,7 @@ export default function PlayersDirectoryPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {players.map((p) => {
             const team = p.team_squads?.[0]?.teams;
             return (
