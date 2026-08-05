@@ -16,7 +16,7 @@ export function getOpenApiDocumentation() {
     openapi: "3.0.0",
     info: {
       title: "IPL Lens API",
-      version: "1.1.0",
+      version: "1.2.0",
       description:
         "API documentation for IPL 2022 data analytics platform covering tournament standings, leaderboards, match scorecards, player profiles, wagon wheel spatial shots, and H2H matchups.",
     },
